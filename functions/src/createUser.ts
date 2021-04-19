@@ -16,7 +16,7 @@ export const createAuthUser = async (req: Request, res: Response):
         password: req.body.password,
         displayName: `${req.body.name} ${req.body.lastName}`,
       }).then((userRecord) => {
-        res.status(201).json(userRecord);
+        res.status(201).json(userRecord.uid);
       }).catch((err) => {
         res.status(400).json({err: err.message});
       });
