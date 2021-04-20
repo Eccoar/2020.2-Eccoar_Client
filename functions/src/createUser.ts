@@ -9,26 +9,32 @@ export const ping = async (req: Request, res: Response): Promise<Response> => {
 
 export const createAuthUser = async (req: Request, res: Response):
   Promise<Response | void> => {
-  admin
+  try {
+    const userRecord = await admin
       .auth()
       .createUser({
         email: req.body.email,
         password: req.body.password,
         displayName: `${req.body.name} ${req.body.lastName}`,
-      }).then((userRecord) => {
-        res.status(201).json(userRecord.uid);
-      }).catch((err) => {
-        res.status(400).json({err: err.message});
       });
+      res.status(201).json(userRecord.uid);
+  } catch (err) {
+    return res.status(400).json({err: err.message});
+  }
 };
 
 export const createUser = async (req: Request, res: Response):
   Promise<Response | void> => {
-  try {
-    const user = {...req.body};
-    const resp = await admin.firestore().collection("users").add(user);
-    return res.status(201).json(resp.id);
-  } catch (err) {
-    return res.status(400).json({"err": err.message});
-  }
+  const user = {...req.body};
+  await admin
+      .firestore()
+      .collection("users")
+      .add(user)
+      .then((resp) => {
+        console.log(resp);
+        res.status(201).json(resp.id);
+      })
+      .catch((err) => {
+        res.status(400).json({"err": err.message});
+      });
 };
